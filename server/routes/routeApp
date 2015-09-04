@@ -1,0 +1,48 @@
+/**
+ * routeApp
+ */
+import express from "express";
+import path from "path";
+
+let route = express.Router();
+
+route.get("/", (req, res) => {
+  res.render("index", {
+    title: "index",
+    bundles: {
+      css: ""
+    },
+    content: "content"
+  });
+});
+
+route.get("/login", (req, res) => {
+  res.render("login");
+});
+
+route.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/");
+});
+
+route.get("/user/:id", (req, res) => {
+  res.json(req.params.id);
+});
+
+//app.post('/login',
+//  passport.authenticate('local', { failureRedirect: '/login' }),
+//  function(req, res) {
+//    res.redirect('/');
+//  });
+
+//app.post('/foo', passport.authenticate('local', {
+//  successRedirect: '/profile',
+//  failureRedirect: '/login',
+//  // Required to pass message from local auth callback
+//  failureFlash: true
+//}));
+
+// use composition route middleware pattern
+//app.put("/user", isAdmin, )
+
+export default route;
