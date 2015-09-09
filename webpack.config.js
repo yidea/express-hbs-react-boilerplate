@@ -25,6 +25,11 @@ module.exports = {
         loaders: ["babel-loader?optional=runtime"]
       },
       {
+        test: /\.json$/,
+        include: path.join(__dirname, "client/data"),
+        loaders: ["json-loader"]
+      },
+      {
         test: /\.styl$/,
         loader: ExtractTextPlugin.extract("style-loader", "css-loader!stylus-loader")
       },
@@ -48,18 +53,17 @@ module.exports = {
   resolve: {
     modulesDirectories: ["node_modules", "client", "node_modules/@walmart"],
     extensions: ["", ".js", ".jsx"],
-    // make alias for module import at /config import Configs from "config/configs";
+    // make alias for module import at /configs import Configs from "configs/Constant";
     alias: {
-      config: path.resolve(__dirname, "config")
+      config: path.resolve(__dirname, "configs")
     }
   },
   plugins: [
     // TODO: add webpack-notifier for dev ?
-    // Clean
-    new CleanPlugin(["dist"]),
-    new ExtractTextPlugin("style.[hash].css"),
+    new CleanPlugin(["dist"]), // Clean
+    new ExtractTextPlugin("style.[hash].css"), // Extract CSS from bundle
 
-    // Optimize
+    // Optimize for prod
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin(),
 

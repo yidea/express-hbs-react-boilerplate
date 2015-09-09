@@ -1,14 +1,20 @@
-// ----------------------------------------------------------------------------
-// MongooseUtil
-// ----------------------------------------------------------------------------
+/**
+ * MongooseUtil
+ */
 let mongoose = require("mongoose"),
-  config = require("../configs/MongoConfig");
+  Config = require("../configs/MongoConfig"),
+  Logger = require("./Logger");
 
-//connect to mongodb
-var dbConnection = "mongodb://" + config.host + ":" + config.port + "/" + config.db;
-mongoose.connection.on("error", function (err) {
-  console.log("MongoDB error:", err);
+let dbConnection = `mongodb://${Config.host}:${Config.port}/${Config.db}`;
+let db = mongoose.connection;
+db.on("error", (err) => {
+  Logger.error(`MongoDB error: ${err}`);
 });
+
+db.once("open", () => {
+  Logger.info(`MongoDB is running at ${dbConnection}`);
+});
+
 mongoose.connect(dbConnection);
 
 module.exports = mongoose;

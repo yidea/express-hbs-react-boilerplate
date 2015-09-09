@@ -13,6 +13,7 @@ npm run hot
 `
 
 ## TODO
+- Unify code style. e.g. import/require, promise 
 - read express book
 - setup mongodb + mongoose https://github.com/yidea/express-backbone-boilerplate/blob/master/helpers/db-helper.js
 - auth

@@ -24,10 +24,10 @@ let mime = require("mime-types");
 let favicon = require("serve-favicon");
 let compression = require("compression");
 let session = require("express-session");
-let passport = require("passport");
-let LocalStrategy = require("passport-local").Strategy;
+let flash = require("connect-flash");
+let passport = require("../utils/PassportLocal");
 
-let logger = require("../utils/Logger");
+let Logger = require("../utils/Logger");
 let Constant = require("../configs/Constant");
 let hbsHelper = require("../utils/HbsHelper");
 let routeApp = require("./routes/routeApp");
@@ -37,33 +37,6 @@ const HOST = process.env.HOST || "127.0.0.1",
   NODE_ENV_PROD = "production",
   NODE_ENV_DEV = "development",
   NODE_ENV = process.env.NODE_ENV || NODE_ENV_DEV;
-
-/**
- * Passport local
- * passReqToCallback?
- */
-let admin = {
-  email: "admin@admin.com",
-  password: "asdf"
-};
-passport.use(new LocalStrategy({
-    usernameField: "email"
-  },
-  (username, password, cb) => {
-    if (username === admin.email && password === admin.password) {
-      return cb(null, admin);
-    }
-    return cb(null, {error: "Invalid username or password"});
-  }
-));
-// serializeUser: convert user object(unique key) to a single value to store in session. usually use user.id(from database), server cookie send to user to mark user
-passport.serializeUser((user, cb) => {
-  return cb(null, user.email);
-});
-// deserializeUser: convert user cookie back to object based cookie id
-passport.deserializeUser((id, cb) => {
-  return cb(null, admin);
-});
 
 /**
  * Express Middleware
@@ -92,12 +65,13 @@ app.use(session({ // req.session
   secret: Constant.cookieSecret,
   resave: true,
   saveUninitialized: true,
-  cookie: {maxAge: 3600000} //1 hour
+  //cookie: {maxAge: 3600000} // 1 hour
 }));
+app.use(flash()); // flash message are stored in session
 app.use(passport.initialize()); // Use the passport middleware to enable passport
 app.use(passport.session()); // Enable passport persistent sessions
 
-app.locals.host = HOST; // app.locals persist thru life of app
+//app.locals.host = HOST; // app.locals persist thru life of app
 if (NODE_ENV === NODE_ENV_DEV) {
   app.use(morgan("dev")); // http request logger middleware
 } else {
@@ -119,9 +93,14 @@ app.use((req, res) => { //handle all unhandled requests, put at bottom
 });
 
 /**
+ * MongoDB setup
+ */
+require("../utils/MongooseUtil");
+
+/**
  * Express Start
  */
 app.listen(HTTP_PORT);
-logger.info(`Express server is running at http://${HOST}:${HTTP_PORT}`);
+Logger.info(`Express server is running at http://${HOST}:${HTTP_PORT}`);
 
 module.exports = app;
